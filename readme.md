@@ -1,6 +1,11 @@
-# 通过MGnify API对4.1版本数据的爬虫下载
+# SyncMG
 
-通过复制运行studies.py代码即可
+The program is desinged to download for datas on MGnify
+## Installation
+We recommend using git for our program
+```
+git clone https://github.com/HUST-NingKang-Lab/ONN4MDM.git
+```
 
 
 
