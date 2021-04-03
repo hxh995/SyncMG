@@ -1,5 +1,6 @@
 import argparse
 import mode
+from utils import mkdir
 parser= argparse.ArgumentParser();
 import datetime
 
@@ -26,20 +27,20 @@ if args.mode in ['stat','diff','download']:
             print("output_path={}".format(args.output_path));
         else:
             timefornow= datetime.datetime.now().strftime('%Y-%m-%d')
-            mode.mkdir('data/');
+            mkdir('data/');
             args.output_path='data/stat-'+ timefornow + '.csv'
             print("output_path is missing,the path is {}".format(args.output_path));
-        mode.stat_function(args.output_path);
+        mode.stat_function(args);
     elif args.mode=='diff':
         if (args.input_first_path and args.input_secondary_path) :
                 if args.output_path:
                     print("output_path={}".format(args.output_path));
                 else:
                     timefornow = datetime.datetime.now().strftime('%Y-%m-%d');
-                    mode.mkdir('data/');
+                    mkdir('data/');
                     args.output_path = 'data/diff-' + timefornow + '.csv'
                     print("output_path is missing,the path is {}".format(args.output_path));
-                mode.diff_function(args.input_first_path,args.input_secondary_path,args.output_path)
+                mode.diff_function(args)
         else:
             print("necessary arguments are missing,type -h to get help");
     else:
@@ -52,9 +53,9 @@ if args.mode in ['stat','diff','download']:
         else:
             #未指定输出文件夹，对默认判断文件夹进行判断，不存在则创建
             args.output_path='download-data/'
-            mode.mkdir(args.output_path);
+            mkdir(args.output_path);
             print("output_path is missing,the path is {}".format(args.output_path));
-        mode.download_function(args.output_path,args.input_path,args.threads)
+        mode.download_function(args)
 
 
 else:
