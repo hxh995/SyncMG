@@ -10,6 +10,7 @@ parser.add_argument("mode",type=str,choices=['stat','diff','download'],default='
 parser.add_argument("-o","--output_path",type=str,default="",help='path to store your output file')
 ##增加metadata_path的参数 for mode=stat
 parser.add_argument("-m","--metadata_path",type=str,default="",help='path to store your metadata/label file')
+parser.add_argument("-r","--retry_time",type=int,default=5,help="set a restriction for the number of url-request")
 #增加input-dir的参数
 # for mode=download
 parser.add_argument("-i","--input_path",default="",type=str,help="path to input your csv file in downloads modes");

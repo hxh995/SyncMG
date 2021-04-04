@@ -8,9 +8,16 @@ from tqdm import tqdm
 from pandas import json_normalize
 from joblib import Parallel, delayed, parallel_backend
 #to get the contents of pages
-def read_page(url):
-    req=json.loads(urllib.request.urlopen(url).read().decode('utf-8'));
-    return req;
+def read_page(url,retry_time):
+    ret = ''
+    for i in range(0,retry_time):
+        try:
+            req = json.loads(urllib.request.urlopen(url, timeout=40).read().decode('utf-8'));
+            ret = req;
+            break
+        except:
+            pass;
+    return ret
 
 #获取全部{}.api_type信息的函数
 def get_full_studies(api_type,args):
@@ -20,10 +27,11 @@ def get_full_studies(api_type,args):
         par_backend = 'threads';
         par = Parallel(n_jobs=args.threads, prefer=par_backend);
         #print('Using joblib `{}` parallel backend with {} cores'.format(par_backend, args.threads));
-        req=par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i,api_type)) for i in tqdm(range(1,page+1)));
+        req_pre=par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i,api_type),args.retry_time) for i in tqdm(range(1,page+1)));
         #test
-        #req = par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i, api_type)) for i in tqdm(range(1, 10)));
+        # req_pre = par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i, api_type),args.retry_time) for i in tqdm(range(1, 10)));
         # 将所有页的studies 汇总成df一个表格
+        req=[i for i in req_pre if i !=''];
         df = reduce(lambda x, y: pd.concat([x, y]), map(lambda x: json_normalize(x['data']), req))
         df = df.reset_index(drop=True);
         return df;
