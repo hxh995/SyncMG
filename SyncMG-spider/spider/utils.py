@@ -20,11 +20,9 @@ def get_full_studies(api_type,args):
         par_backend = 'threads';
         par = Parallel(n_jobs=args.threads, prefer=par_backend);
         #print('Using joblib `{}` parallel backend with {} cores'.format(par_backend, args.threads));
-        #req=par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i,api_type)) for i in tqdm(range(1,page+1)));
-        req = par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i, api_type)) for i in tqdm(range(1, 10)));
-        # 下载学习页的json文件
-        #req=[json.loads(urllib.request.urlopen('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i,api_type)).read().decode('utf-8')) for i in tqdm(range(1,page+1))];
-        #req = [json.loads(urllib.request.urlopen('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i,api_type)).read().decode('utf-8')) for i in tqdm(range(4, 10))];
+        req=par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i,api_type)) for i in tqdm(range(1,page+1)));
+        #test
+        #req = par(delayed(read_page)('https://www.ebi.ac.uk/metagenomics/api/v1/{1}?page={0}'.format(i, api_type)) for i in tqdm(range(1, 10)));
         # 将所有页的studies 汇总成df一个表格
         df = reduce(lambda x, y: pd.concat([x, y]), map(lambda x: json_normalize(x['data']), req))
         df = df.reset_index(drop=True);
