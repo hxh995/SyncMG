@@ -6,32 +6,22 @@ import csv
 from joblib import Parallel, delayed, parallel_backend
 from tqdm import tqdm
 from pandas import json_normalize
-from utils import get_full_studies
+from utils import get_full_studies,load_studies,load_analyses,load_samples
 
 def stat_function(args):
     #test for stat_function
     #print('the path is {}'.format(args.output_path));
-    df=get_full_studies();
-    df['pipeline_version']='';
-    links=df['relationships.downloads.links.related']
-    drop_list=list();
-    for i in tqdm(range(0, len(links))):
-        data=json.loads(urllib.request.urlopen(links[i]).read().decode('utf-8'))['data'];
-        if  data == []:
-            drop_list.append(i);
-        else:
-            secondary=df['attributes.secondary-accession'][i];
-            data=json_normalize(data);
-            relationship_pipeline=data['relationships.pipeline.data.id'][data.id.str.contains(secondary+'_taxonomy_abundances?.*',regex=True)];
-            pipeline_version=[];
-            [pipeline_version.append(i) for i in list(relationship_pipeline) if not i in pipeline_version];
-            df.loc[i,['pipeline_version']]='|'.join(pipeline_version);
-
-    df = df.drop(drop_list);
+    df_studies=get_full_studies('studies',args);
+    load_studies(df_studies,args);
+    df_analyses = get_full_studies('analyses',args);
+    df_analyses=load_analyses(df_analyses);
+    df_samples= get_full_studies('samples',args);
+    df_samples=load_samples(df_samples);
+    df = pd.merge(df_analyses, df_samples, left_on='sample', right_on='sample')
     df = df.reset_index(drop=True)
-    data = ['|'.join(j['id'] for j in i) for i in df['relationships.biomes.data']];
-    df['biomes']=data;
-    df.to_csv(args.output_path,sep=',');
+    df.to_csv(args.metadata_path,sep=',');
+
+
 def diff_function(args):
     print("args_ins={},args_inf={}".format(args.input_secondary_path,args.input_first_path));
     df_inf = pd.read_csv(args.input_first_path, low_memory=False).iloc[:,1:];
@@ -83,5 +73,5 @@ def download_function(args):
     id = list(df['id'])  # 将全部的studies的4.1版本tsv下载
     par_backend = 'threads'  # {‘processes’, ‘threads’}
     par = Parallel(n_jobs=args.threads, prefer=par_backend)
-    print('Using joblib `{}` parallel backend with {} cores'.format(par_backend, args.threads))
+    #print('Using joblib `{}` parallel backend with {} cores'.format(par_backend, args.threads))
     res = par(delayed(download_data)(accession=accession[i], secondary=secondary[i],id=id[i],args_output=args.output_path) for i in tqdm(range(len(accession))));

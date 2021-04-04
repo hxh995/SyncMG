@@ -8,6 +8,8 @@ import datetime
 parser.add_argument("mode",type=str,choices=['stat','diff','download'],default='',help='choose a mode to use the program.default:None')
 #增加output-dir的参数 for mode=stat/diff/downloads
 parser.add_argument("-o","--output_path",type=str,default="",help='path to store your output file')
+##增加metadata_path的参数 for mode=stat
+parser.add_argument("-m","--metadata_path",type=str,default="",help='path to store your metadata/label file')
 #增加input-dir的参数
 # for mode=download
 parser.add_argument("-i","--input_path",default="",type=str,help="path to input your csv file in downloads modes");
@@ -30,6 +32,13 @@ if args.mode in ['stat','diff','download']:
             mkdir('data/');
             args.output_path='data/stat-'+ timefornow + '.csv'
             print("output_path is missing,the path is {}".format(args.output_path));
+        if args.metadata_path:
+            print("metadata_path={}".format(args.metadata_path));
+        else:
+            timefornow = datetime.datetime.now().strftime('%Y-%m-%d')
+            mkdir('data/');
+            args.metadata_path = 'data/metadata-' + timefornow + '.csv'
+            print("metadata_path is missing,the path is {}".format(args.metadata_path));
         mode.stat_function(args);
     elif args.mode=='diff':
         if (args.input_first_path and args.input_secondary_path) :
