@@ -26,10 +26,14 @@ usage: SyncMG.py [-h] [-o OUTPUT_PATH] [-i INPUT_PATH] [-t THREADS]
   you can use ```stat```  to check the current data on MGnify,which will return a csv file to show details of data
 
   ```cmd
-  python SyncMG.py stat [-o]
+  python SyncMG.py stat [-o] [-m] [-t]
   ```
 
   you can use ```-o``` to specify the path to output ,or you can check it in the 'data' file
+
+  ``-m`` is to specify a path to save your metadata,which shows the label for the biome of each run.
+
+  ``-t``  is to specify the numbers of threads in order to improve the rate of program
 
 + ```diff```
 
