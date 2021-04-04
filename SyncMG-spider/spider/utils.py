@@ -16,7 +16,7 @@ def read_page(url):
 def get_full_studies(api_type,args):
         # 获取目前{}.api_type 总页数
         page_req = json.loads(urllib.request.urlopen('https://www.ebi.ac.uk/metagenomics/api/v1/{}'.format(api_type)).read().decode('utf-8'))['links']['last']
-        page = re.search('.*?page=(\d*)', page_req).group(1)
+        page = int(re.search('.*?page=(\d*)', page_req).group(1));
         par_backend = 'threads';
         par = Parallel(n_jobs=args.threads, prefer=par_backend);
         #print('Using joblib `{}` parallel backend with {} cores'.format(par_backend, args.threads));
