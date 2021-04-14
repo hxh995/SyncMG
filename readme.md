@@ -1,6 +1,6 @@
 # SyncMG
 
-The program is desinged to download for datas on MGnify
+The program is designed to download for datas on MGnify
 ## Installation
 We recommend using git for our program
 ```
