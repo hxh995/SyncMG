@@ -1,4 +1,6 @@
+import os
 import urllib.request
+from urllib import request
 import urllib.error
 import json
 import pandas as pd
@@ -29,6 +31,30 @@ def diff_function(args):
     df = df_inf.append(df_ins).drop_duplicates(['id'],keep=False);
     df = df.reset_index(drop=True)
     df.to_csv(args.output_path,sep=',');
+
+
+def download_data(accession, secondary, id, args_output):
+	url = 'https://www.ebi.ac.uk/metagenomics/api/v1/studies/{}/pipelines/4.1/file/{}_taxonomy_abundances_SSU_v4.1.tsv'.format(accession, secondary)
+	filename = os.path.join(args_output, accession+'.tsv')
+	ret = ''
+	max_retries = 5
+	retry = 0
+	#ret, __ = request.urlretrieve(url, filename)
+	while ret != filename:
+		try:
+			ret, __ = request.urlretrieve(url, filename)
+			print('succeeded with `{}`!'.format(accession))
+		except Exception as e:
+			print(e, url)
+			if retry <= max_retries:
+				print('failed with `{}`, still retrying...'.format(accession))
+			else:
+				print('Too many times of retrying, skiped!')
+				break
+			retry = retry + 1
+	os.system('echo {} >> failed_list.txt'.format(accession))
+
+'''
 def download_data(accession,secondary,id,args_output):
     try:
         # 将下载的内容储存成filecontents中并写入tsv文件
@@ -59,6 +85,9 @@ def download_data(accession,secondary,id,args_output):
         if hasattr(e, "reason"):
            # print(e.reason)
             pass
+'''
+
+
 def download_function(args):
     # test
     #print("args_output={},args_threads={},args_input={}".format(args.output_path,args.threads,args.input_path));
