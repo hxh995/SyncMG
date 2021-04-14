@@ -1,4 +1,5 @@
 import os
+import requests
 import urllib.request
 from urllib import request
 import urllib.error
@@ -40,9 +41,12 @@ def download_data(accession, secondary, id, args_output):
 	max_retries = 5
 	retry = 0
 	#ret, __ = request.urlretrieve(url, filename)
-	while ret != filename:
+	while ret == '':
 		try:
-			ret, __ = request.urlretrieve(url, filename)
+			ret = requests.get(url)
+			with open(filename,'w') as f:
+				f.write(str(ret.content, encoding='utf-8'))
+			#ret, __ = request.urlretrieve(url, filename)
 			print('succeeded with `{}`!'.format(accession))
 		except Exception as e:
 			print(e, url)
