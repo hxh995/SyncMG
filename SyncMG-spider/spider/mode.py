@@ -34,11 +34,11 @@ def diff_function(args):
     df.to_csv(args.output_path,sep=',');
 
 
-def download_data(accession, secondary, id, args_output):
+def download_data(accession, secondary, id, args_output,max_retry):
 	url = 'https://www.ebi.ac.uk/metagenomics/api/v1/studies/{}/pipelines/4.1/file/{}_taxonomy_abundances_SSU_v4.1.tsv'.format(accession, secondary)
 	filename = os.path.join(args_output, accession+'.tsv')
 	ret = ''
-	max_retries = 5
+	max_retries = max_retry
 	retry = 0
 	#ret, __ = request.urlretrieve(url, filename)
 	while ret == '':
@@ -48,17 +48,19 @@ def download_data(accession, secondary, id, args_output):
 				f.write(str(ret.content, encoding='utf-8'))
 			#ret, __ = request.urlretrieve(url, filename)
 			print('succeeded with `{}`!'.format(accession))
+			os.system('echo {} >> succeeded_list.txt'.format(accession))
 		except Exception as e:
 			print(e, url)
 			if retry <= max_retries:
 				print('failed with `{}`, still retrying...'.format(accession))
 			else:
 				print('Too many times of retrying, skiped!')
+				os.system('echo {} >> failed_list.txt'.format(accession))
 				break
 			retry = retry + 1
-	os.system('echo {} >> failed_list.txt'.format(accession))
-
+	
 '''
+
 def download_data(accession,secondary,id,args_output):
     try:
         # 将下载的内容储存成filecontents中并写入tsv文件
@@ -107,4 +109,4 @@ def download_function(args):
     par_backend = 'threads'  # {‘processes’, ‘threads’}
     par = Parallel(n_jobs=args.threads, prefer=par_backend)
     #print('Using joblib `{}` parallel backend with {} cores'.format(par_backend, args.threads))
-    res = par(delayed(download_data)(accession=accession[i], secondary=secondary[i],id=id[i],args_output=args.output_path) for i in tqdm(range(len(accession))));
+    res = par(delayed(download_data)(accession=accession[i], secondary=secondary[i],id=id[i],args_output=args.output_path,max_retry=args.retry_time) for i in tqdm(range(len(accession))));
